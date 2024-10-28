@@ -1,0 +1,67 @@
+#include "mbed.h"
+#include <cstdio>
+
+// Interpolación de pasos entre vértices (aumentar si es necesario para suavizar las líneas)
+#define STEPS 500      
+#define DELAY_US 200   // Tiempo entre pasos (ajustar según los límites de tiempo de 40 ms)
+#define SIZE 15.f
+#define VERTICES 19
+
+#define PERIOD 0.001f
+
+using namespace std::chrono;
+
+PwmOut CH1(p21);
+PwmOut CH2(p22);
+AnalogIn an1(p15);
+AnalogIn an2(p16);
+
+
+double tree[VERTICES][2] = {
+    {4,0},
+    {4,2 }, 
+    {0,2 }, 
+    {4,5 }, 
+    {1, 5}, 
+    {4, 8}, 
+    {2, 8}, 
+    {4, 10}, 
+    {3, 10}, 
+    {5, 13}, 
+    {7, 10}, 
+    {6, 10}, 
+    {8, 8}, 
+    {6, 8}, 
+    {9, 5}, 
+    {6, 5}, 
+    {10, 2}, 
+    {6, 2}, 
+    {6, 0}, 
+};
+
+void drawLine(int x1, int y1, int x2, int y2) {
+    for (int i = 0; i <= STEPS; i++) {
+        int x = x1 + ((x2 - x1) * i) / STEPS;
+        int y = y1 + ((y2 - y1) * i) / STEPS;
+        CH1.write(x/SIZE); 
+        CH2.write(y/SIZE);
+        wait_us(DELAY_US);
+    }
+}
+
+int main()
+{
+    CH1.period(PERIOD);
+    CH2.period(PERIOD);
+    
+
+    float x, y;
+    float pwm_x, pwm_y;
+
+    while (1) {
+        for (int i = 0; i < VERTICES; i++) {
+            int next = (i + 1) % VERTICES;
+            drawLine(tree[i][0], tree[i][1], tree[next][0], tree[next][1]); 
+        }
+    }
+}

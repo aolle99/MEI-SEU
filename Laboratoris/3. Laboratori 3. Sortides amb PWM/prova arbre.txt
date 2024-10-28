@@ -1,0 +1,58 @@
+#include "mbed.h"
+#include <cstdio>
+
+
+// Interpolación de pasos entre vértices (aumentar si es necesario para suavizar las líneas)
+#define STEPS 4      
+#define DELAY_US 1   // Tiempo entre pasos (ajustar según los límites de tiempo de 40 ms)
+#define VERTICES 19  // Numero de vertices
+#define MATRIX_SIZE 20.0f
+
+using namespace std::chrono;
+
+PwmOut CH1(p21);
+PwmOut CH2(p22);
+AnalogIn an1(p15);
+AnalogIn an2(p16);
+
+const int x_axis[VERTICES] = {9,9,3,9,4,9,6,9,8,10,12,11,14,11,16,11,17,11,11};
+const int y_axis[VERTICES] = {3,6,6,10,14,14,17,17,19,17,17,14,14,10,10,6,6,3};
+
+void draw_shape() {
+    for (int i = 0; i < VERTICES; i++) {
+        CH1.write(x_axis[i]);  // Configurar PWM para X
+        CH2.write(y_axis[i]);  // Configurar PWM para Y
+        wait_us(DELAY_US);
+    }
+}
+
+// Dibujar "luces" en posiciones aleatorias en el árbol
+void draw_lights() {
+    for (int i = 0; i < 5; i++) {  // 5 luces aleatorias
+        float x = 0.3 + ((float)rand() / RAND_MAX) * 0.4;  // Posición X entre 0.3 y 0.7
+        float y = 0.2 + ((float)rand() / RAND_MAX) * 0.6;  // Posición Y entre 0.2 y 0.8
+        CH1.write(x);
+        CH2.write(y);
+        wait_us(DELAY_US);
+    }
+}
+
+int main()
+{
+    CH1.period(0.001f);
+    CH2.period(0.001f);
+
+    float x, y;
+    float pwm_x, pwm_y;
+
+    while (1) {
+        
+        // Dibujar la estructura del árbol
+       draw_shape();
+
+        // Dibujar luces que parpadean
+        //draw_lights();
+
+        wait_us(DELAY_US);
+    }
+}
