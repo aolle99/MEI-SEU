@@ -33,10 +33,6 @@ int main()
 {
     CH1.period(PERIOD);
     CH2.period(PERIOD);
-    
-
-    float x, y;
-    float pwm_x, pwm_y;
 
     while (1) {
         //Dibuixat dels vertexs de l'arbre de nadal
