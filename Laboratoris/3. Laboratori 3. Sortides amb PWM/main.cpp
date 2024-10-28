@@ -1,20 +1,13 @@
 #include "mbed.h"
 #include <cstdio>
 
-
 #define STEPS 500  // Nombre de punts que es dibuixen a cada línea    
 #define DELAY_US 150   // Temps entre el dibuixat de cada punt
 #define SIZE 20.f // Tamany del dibuix (per facilitar-ne el traçat
-
 #define PERIOD 0.001f // Període del PWM
-
-using namespace std::chrono;
 
 PwmOut CH1(p21);
 PwmOut CH2(p22);
-AnalogIn an1(p15);
-AnalogIn an2(p16);
-
 
 int tree[19][2] = {
     {4,0}, {4,2}, {0,2}, {4,5}, {1,5}, {4,8}, {2,8}, {4,10}, {3,10}, {5,13},
