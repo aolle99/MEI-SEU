@@ -1,11 +1,13 @@
 #include "mbed.h"
 
-CAN can(p30, p29);  // CAN RX, CAN TX
-AnalogOut aout1(p18);  // Salida analógica para el primer punto
-AnalogOut aout2(p19);  // Salida analógica para el segundo punto
+#define CAN_BAUDRATE 500000
+#define DELAY_US 150
+
+CAN can(p30, p29, CAN_BAUDRATE);  // CAN RX, CAN TX
+AnalogOut OUTX(p18);  // Salida analógica para el primer punto
+AnalogOut OUTY(p19);  // Salida analógica para el segundo punto
 
 int main() {
-    can.frequency(250000);  // Configura la frecuencia del bus CAN a 250 kbps
     CANMessage msg;
     while (1) {
         
@@ -15,14 +17,14 @@ int main() {
                 float y = static_cast<float>(msg.data[1]) / 255.0f;
                 
                 if (msg.id == 0x00) {
-                    aout1.write(x);
-                    aout2.write(y);
+                    OUTX.write(x);
+                    OUTY.write(y);
                 } else {  // msg.id == 0x01
-                    aout1.write(y);
-                    aout2.write(x);
+                    OUTX.write(y);
+                    OUTY.write(x);
                 }
             }
         }
-        ThisThread::sleep_for(20ms);
+        delay_us(DELAY_US);
     }
 }
