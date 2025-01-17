@@ -21,6 +21,9 @@ void Timer::update() {
         }
     
         displayTime();
+        if(hasFinished()) {
+          GameState::setState(GameStatus::DEFEAT);
+        }
     }
 }
 

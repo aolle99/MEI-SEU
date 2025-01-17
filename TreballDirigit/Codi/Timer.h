@@ -4,6 +4,7 @@
 #include <Arduino.h>
 #include <TM1637Display.h>
 #include <LiquidCrystal.h>
+#include "GameState.h"
 
 // 7-segment display configuration
 

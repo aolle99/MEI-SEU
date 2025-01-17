@@ -22,7 +22,7 @@ enum class Enigma1State {
 
 extern LiquidCrystal lcd;
 
-const int CORRECT_CODE[] = {1, 2, 3, 4};
+const int CORRECT_CODE[] = {4, 8, 5, 7};
 const int CODE_LENGTH = 4;
 
 bool updateEnigma1();

@@ -38,8 +38,9 @@ void setup() {
 }
 
 void loop() {
-  timer.update();
+
   if (GameState::isGameActive()) {
+    timer.update();
     switch (GameState::getState()) {
       case GameStatus::START:
         if(updateWelcomeMessage()) {

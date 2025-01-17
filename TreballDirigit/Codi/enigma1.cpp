@@ -16,7 +16,7 @@ bool isDigitVisible = true;
 bool updateEnigma1() {
     switch (enigma1State) {
         case Enigma1State::INIT:
-            lcd.clear()
+            lcd.clear();
             lcd.setCursor(0, 0);
             lcd.print("Codi:");
             lcd.setCursor(0, 1);
@@ -96,10 +96,10 @@ void updateDisplay() {
 int readLCDButtons() {
     int adc_key_in = analogRead(LCD_BUTTONS);
     Serial.println(adc_key_in);
-    if (adc_key_in >= 1020) return LCD_BTN_NONE;
+    if (adc_key_in >= 1023) return LCD_BTN_NONE;
     if (adc_key_in < 100) return LCD_BTN_RIGHT;
     if (adc_key_in < 300) return LCD_BTN_UP;
     if (adc_key_in < 550) return LCD_BTN_DOWN;
     if (adc_key_in < 800) return LCD_BTN_LEFT;
-    if (adc_key_in < 1020) return LCD_BTN_SELECT;
+    if (adc_key_in < 1023) return LCD_BTN_SELECT;
 }

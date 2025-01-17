@@ -69,10 +69,11 @@ void movePlayer() {
     
     int newPosX = posX;
     int newPosY = posY;
-    if (x < 300 && posX > 0) newPosX--;
-    if (x > 800 && posX < MAP_WIDTH - 1) newPosX++;
-    if (y < 300 && posY > 0) newPosY--;
-    if (y > 800 && posY < MAP_HEIGHT - 1) newPosY++;
+
+    if (y > 800 && posX > 0) newPosX--;
+    if (y < 300 && posX < MAP_WIDTH - 1) newPosX++;
+    if (x < 300 && posY > 0) newPosY--;
+    if (x > 800 && posY < MAP_HEIGHT - 1) newPosY++;
     
     if (gameMap[newPosY][newPosX] != '#') {
         posX = newPosX;

@@ -5,7 +5,8 @@ BoxLock::BoxLock() : isOpen(true) {}
 
 void BoxLock::initialize() {
     lockServo.attach(SERVO_PIN);
-    delay(500);
+    lockServo.write(OPEN_ANGLE);
+    delay(4000); // Give the servo time to move
     close(); // Ensure the box starts closed
 }
 
