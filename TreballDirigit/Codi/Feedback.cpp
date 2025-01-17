@@ -33,15 +33,19 @@ void Feedback::startMelody() {
 }
 
 void Feedback::successMelody() {
+    greenLedOn();
     int melody[] = {NOTE_C5, NOTE_G4, NOTE_E4, NOTE_C4};
     int durations[] = {8, 8, 8, 8};
     playMelody(melody, durations, 4);
+    greenLedOff();
 }
 
 void Feedback::failureMelody() {
+  redLedOn();
     int melody[] = {NOTE_C4, NOTE_B4, NOTE_A4, NOTE_G4};
     int durations[] = {4, 4, 4, 4};
     playMelody(melody, durations, 4);
+    redLedOff();
 }
 
 void Feedback::victoryMelody() {

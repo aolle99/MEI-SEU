@@ -19,18 +19,22 @@ TM1637Display display(CLK, DIO);
 Timer timer;
 BoxLock BoxLock;
 
-void setup() {
-
-  // LCD initialization
-  lcd.begin(16, 2);
-
-  Serial.begin(9600);
-
+void initializeGame() {
+  lcd.clear();
   GameState::initialize();
   Feedback::initialize();
   timer.initialize();
-  IrReceiver.begin(IR_RECEIVER_PIN, ENABLE_LED_FEEDBACK);
   BoxLock.initialize();
+}
+
+void setup() {
+  // LCD initialization
+  lcd.begin(16, 2);
+  lcd.clear();
+  Serial.begin(9600);
+  randomSeed(analogRead(0));
+  IrReceiver.begin(IR_RECEIVER_PIN, ENABLE_LED_FEEDBACK);
+  initializeGame();
 }
 
 void loop() {
@@ -39,7 +43,7 @@ void loop() {
     switch (GameState::getState()) {
       case GameStatus::START:
         if(updateWelcomeMessage()) {
-          GameState::setState(GameStatus::ENIGMA3);
+          GameState::setState(GameStatus::ENIGMA1);
         }
         break;
       case GameStatus::ENIGMA1:
@@ -72,6 +76,7 @@ enum class WelcomeState {
     INIT,
     FIRST_LINE,
     SECOND_LINE,
+    THIRD_LINE,
     LEDS_ON,
     LEDS_OFF,
     FINISHED
@@ -90,22 +95,38 @@ bool updateWelcomeMessage() {
             break;
 
         case WelcomeState::FIRST_LINE:
-            if (currentTime - lastStateChange >= 1000) {
+            if (currentTime - lastStateChange >= 100) {
                 lcd.setCursor(0, 0);
-                lcd.print("Welcome to");
+                lcd.print("Benvingut al");
+                lcd.setCursor(0, 1);
+                lcd.print("Escaperoom!");
                 lastStateChange = currentTime;
                 welcomeState = WelcomeState::SECOND_LINE;
             }
             break;
 
         case WelcomeState::SECOND_LINE:
-            if (currentTime - lastStateChange >= 200) {
+            if (currentTime - lastStateChange >= 2000) {
+                lcd.clear();
+                lcd.setCursor(0, 0);
+                lcd.print("Supera");
                 lcd.setCursor(0, 1);
-                lcd.print("the Escape Room!");
+                lcd.print("les proves");
                 lastStateChange = currentTime;
-                welcomeState = WelcomeState::LEDS_ON;
+                welcomeState = WelcomeState::THIRD_LINE;
             }
             break;
+        case WelcomeState::THIRD_LINE:
+          if (currentTime - lastStateChange >= 2000) {
+              lcd.clear();
+              lcd.setCursor(0, 0);
+              lcd.print("i obriras");
+              lcd.setCursor(0, 1);
+              lcd.print("la caixa");
+              lastStateChange = currentTime;
+              welcomeState = WelcomeState::LEDS_ON;
+          }
+          break;
 
         case WelcomeState::LEDS_ON:
             Feedback::greenLedOn();
@@ -133,7 +154,7 @@ bool updateWelcomeMessage() {
 void openBox() {
   BoxLock.open();
   lcd.clear();
-  lcd.print("Box opened!");
+  lcd.print("Caixa oberta!");
   Feedback::greenLedOn();
   Feedback::redLedOff();
   Feedback::victoryMelody();
@@ -145,16 +166,15 @@ void handleRemoteControl() {
     IrReceiver.resume();
     switch (lastCode) {
       case 69:
-        GameState::initialize();
-        timer.initialize();
         lcd.clear();
-        lcd.print("Game restarted");
+        lcd.print("Reiniciant...");
         delay(1000);
+        initializeGame();
         break;
       case 70:
-        GameState::setState(GameStatus::FINISHED);
+        GameState::setState(GameStatus::VICTORY);
         lcd.clear();
-        lcd.print("Game ended");
+        lcd.print("Joc Acabat");
         Feedback::redLedOn();
         Feedback::greenLedOff();
         break;
@@ -163,7 +183,7 @@ void handleRemoteControl() {
         if (currentState != GameStatus::VICTORY && currentState != GameStatus::FINISHED) {
           GameState::setState(static_cast<GameStatus>(static_cast<int>(currentState) + 1));
           lcd.clear();
-          lcd.print("Next level");
+          lcd.print("Seguent nivell");
           delay(1000);
         }
         break;

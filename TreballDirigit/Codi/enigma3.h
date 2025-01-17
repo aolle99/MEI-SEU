@@ -10,8 +10,10 @@
 extern LiquidCrystal lcd;
 
 void initializeEnigma3();
+bool isValidMove(int x, int y);
 void movePlayer();
 bool checkSolution();
 bool updateEnigma3();
+void drawMap();
 
 #endif

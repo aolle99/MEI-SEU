@@ -13,38 +13,78 @@ byte playerChar[8] = {
     B00100, B00100, B01010, B01010
 };
 
+const int MAP_WIDTH = 32;
+const int MAP_HEIGHT = 2;
+const int SCREEN_WIDTH = 16;
+const int SCREEN_HEIGHT = 2;
+
 int posX = 0, posY = 0;
-int targetX = 15, targetY = 1;
+int targetX = 31, targetY = 1;
+int viewX = 0;
 Enigma3State enigma3State = Enigma3State::INIT;
 unsigned long lastMoveTime = 0;
-const unsigned long moveDelay = 100;
+const unsigned long moveDelay = 200; // Cooldown de 200ms entre movimientos
+
+// Definir el mapa más grande
+char gameMap[MAP_HEIGHT][MAP_WIDTH+1] = {
+    "---#---###---#------#---#---#---",
+    "-----#-----#---####---#---#---#X"
+};
 
 void initializeEnigma3() {
     lcd.clear();
     lcd.createChar(0, playerChar);
-    lcd.setCursor(targetX, targetY);
-    lcd.write('X');
     posX = 0;
     posY = 0;
+    viewX = 0;
     enigma3State = Enigma3State::MOVE_PLAYER;
+    drawMap();
+}
+
+void drawMap() {
+    for (int y = 0; y < SCREEN_HEIGHT; y++) {
+        lcd.setCursor(0, y);
+        for (int x = 0; x < SCREEN_WIDTH; x++) {
+            if (x + viewX == posX && y == posY) {
+                lcd.write(byte(0)); // Dibujar jugador
+            } else {
+              if(gameMap[y][x + viewX] =='-') {
+                lcd.write(" ");
+              }
+              else {
+                lcd.write(gameMap[y][x + viewX]);
+              }
+            }
+        }
+    }
 }
 
 void movePlayer() {
+    if (millis() - lastMoveTime < moveDelay) {
+        return; // Aún no ha pasado suficiente tiempo desde el último movimiento
+    }
+
     int x = analogRead(JOYSTICK_X);
     int y = analogRead(JOYSTICK_Y);
     
-    lcd.setCursor(posX, posY);
-    lcd.print(' ');
-
-    Serial.println(x);
+    int newPosX = posX;
+    int newPosY = posY;
+    if (x < 300 && posX > 0) newPosX--;
+    if (x > 800 && posX < MAP_WIDTH - 1) newPosX++;
+    if (y < 300 && posY > 0) newPosY--;
+    if (y > 800 && posY < MAP_HEIGHT - 1) newPosY++;
     
-    if (x < 300 && posX > 0) posX--;
-    if (x > 700 && posX < 15) posX++;
-    if (y < 300 && posY > 0) posY--;
-    if (y > 700 && posY < 1) posY++;
-    
-    lcd.setCursor(posX, posY);
-    lcd.write(byte(0));
+    if (gameMap[newPosY][newPosX] != '#') {
+        posX = newPosX;
+        posY = newPosY;
+        
+        // Actualizar la vista si el jugador se acerca a los bordes
+        if (posX - viewX < 3 && viewX > 0) viewX--;
+        if (posX - viewX > SCREEN_WIDTH - 4 && viewX < MAP_WIDTH - SCREEN_WIDTH) viewX++;
+        
+        drawMap();
+        lastMoveTime = millis();
+    }
 }
 
 bool checkSolution() {
@@ -58,13 +98,9 @@ bool updateEnigma3() {
             break;
         
         case Enigma3State::MOVE_PLAYER:
-            if (millis() - lastMoveTime >= moveDelay) {
-                movePlayer();
-                lastMoveTime = millis();
-                enigma3State = Enigma3State::CHECK_SOLUTION;
-            }
+            movePlayer();
+            enigma3State = Enigma3State::CHECK_SOLUTION;
             break;
-        
         case Enigma3State::CHECK_SOLUTION:
             if (checkSolution()) {
                 enigma3State = Enigma3State::SOLVED;

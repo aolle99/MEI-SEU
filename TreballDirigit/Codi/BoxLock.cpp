@@ -1,14 +1,15 @@
+#include "Arduino.h"
 #include "BoxLock.h"
 
-BoxLock::BoxLock() : isOpen(false) {}
+BoxLock::BoxLock() : isOpen(true) {}
 
 void BoxLock::initialize() {
     lockServo.attach(SERVO_PIN);
+    delay(500);
     close(); // Ensure the box starts closed
 }
 
 void BoxLock::open() {
-  Serial.println("TEST2");
     if (!isOpen) {
         lockServo.write(OPEN_ANGLE);
         lcd.clear();

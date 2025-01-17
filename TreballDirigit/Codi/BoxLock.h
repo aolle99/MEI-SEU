@@ -10,12 +10,12 @@ extern LiquidCrystal lcd;
 
 class BoxLock {
 private:
-    static const int SERVO_PIN = 36;
+    static const int SERVO_PIN = 2;
     static const int OPEN_ANGLE = 90;
     static const int CLOSED_ANGLE = 0;
     
     Servo lockServo;
-    bool isOpen;
+    bool isOpen=true;
 
 public:
     BoxLock();
